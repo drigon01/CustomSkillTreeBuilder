@@ -20,9 +20,20 @@ namespace CustomSkillTreeBuilder
   /// </summary>
   public partial class MainWindow : Window
   {
+
     public MainWindow()
     {
       InitializeComponent();
+    }
+
+    private void Open_Clicked(object sender, RoutedEventArgs e)
+    {
+      (DataContext as MainViewModel).Open();
+    }
+
+    private void Save_Clicked(object sender, RoutedEventArgs e)
+    {
+      (DataContext as MainViewModel).Save();
     }
   }
 }
