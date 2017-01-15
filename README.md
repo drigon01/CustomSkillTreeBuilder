@@ -1,8 +1,8 @@
 # CustomSkillTreeBuilder
 small project to make custom skill tree building easier for our local larping community
 
-expected tree structure:
-
+##expected tree structure:
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <SkillTreeComponents xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <SkillFamilies>
@@ -18,3 +18,4 @@ expected tree structure:
     </SkillFamily>
   </SkillFamilies>
 </SkillTreeComponents>
+```
