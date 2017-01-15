@@ -12,12 +12,31 @@
       <RowDefinition Height="24"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
-    <Menu IsMainMenu="True" Grid.Row="0">
-      <MenuItem Header="_File">
-        <MenuItem Header="_Open" Click="Open_Clicked"/>
-        <MenuItem Header="Save" Click="Save_Clicked"/>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="100"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+    <Menu IsMainMenu="True" Grid.Row="0" Grid.ColumnSpan="2">
+      <MenuItem Header="Components">
+        <MenuItem CommandParameter="Components" Header="_Open" Click="Open_Clicked"/>
+        <MenuItem CommandParameter="Components" Header="_Save" Click="Save_Clicked"/>
+      </MenuItem>
+      <MenuItem Header="SkillTree">
+        <MenuItem CommandParameter="SkillTree" Header="_Open" Click="Open_Clicked"/>
+        <MenuItem CommandParameter="SkillTree" Header="_Save" Click="Save_Clicked"/>
         <MenuItem Header="Print" />
       </MenuItem>
     </Menu>
+    <ScrollViewer x:Name="mSideMenu" Grid.Row="1" Grid.Column="0" >
+      <ItemsControl ItemsSource="{Binding SkillTreeComponents.SkillFamilies}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Button Width="40" Height="40" >ASD</Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+    <Canvas Grid.Row="1" Grid.Column="1" x:Name="mCanvas" Background="{Binding BGImage}">
+    </Canvas>
   </Grid>
 </Window>
