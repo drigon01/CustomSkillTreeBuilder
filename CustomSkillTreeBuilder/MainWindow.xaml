@@ -27,16 +27,31 @@
         <MenuItem Header="Print" />
       </MenuItem>
     </Menu>
-    <ScrollViewer x:Name="mSideMenu" Grid.Row="1" Grid.Column="0" >
-      <ItemsControl ItemsSource="{Binding SkillTreeComponents.SkillFamilies}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate>
-            <Button Width="40" Height="40" >ASD</Button>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </ScrollViewer>
-    <Canvas Grid.Row="1" Grid.Column="1" x:Name="mCanvas" Background="{Binding BGImage}">
-    </Canvas>
+    <TreeView x:Name="mSideMenu" Grid.Row="1" Grid.Column="0" 
+              ItemsSource="{Binding SkillTreeComponents.SkillFamilies}"
+              ScrollViewer.CanContentScroll="True">
+      <TreeView.Resources>
+        <HierarchicalDataTemplate DataType="{x:Type local:SkillFamily}" ItemsSource="{Binding Skills}" >
+          <TextBlock Text="{Binding Name}" Margin="2"/>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate DataType="{x:Type local:Skill}">
+          <TextBlock Text="{Binding Name}" Margin="2" MouseDown="SkillSelected" >
+            <TextBlock.ToolTip>
+              <StackPanel>
+                <ItemsControl ItemsSource="{Binding Effects}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding}" Margin="10,0,0,0"/>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </TextBlock.ToolTip>
+          </TextBlock>
+        </HierarchicalDataTemplate>
+      </TreeView.Resources>
+    </TreeView>
+    <Canvas Grid.Row="1" Grid.Column="1"
+            x:Name="mCanvas" Background="{Binding BGImage}"/>
   </Grid>
 </Window>

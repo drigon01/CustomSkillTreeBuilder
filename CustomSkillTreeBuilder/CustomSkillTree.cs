@@ -28,14 +28,15 @@ namespace CustomSkillTreeBuilder
     public string Name { get; set; }
     [XmlElement("Effect")]
     public string[] Effects { get; set; }
+    [XmlElement("Skill")]
+    public List<Skill> ChildSkills{get;set;}
   }
 
   /// <summary>
   /// Describes a Skill tree with connections and variosu skills;
   /// </summary>
-  public class SkillTree
+  public class SkillTree : List<Skill>
   {
-    [XmlElement("Connection")]
-    public Dictionary<Skill,List<Skill>> Tree { get; set; }
+
   }
 }

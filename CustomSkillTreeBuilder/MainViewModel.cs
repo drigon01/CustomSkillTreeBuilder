@@ -1,8 +1,9 @@
-﻿using CustomSkillTreeBuilder;
-using CustomSkillTreeBuilder.Properties;
+﻿using CustomSkillTreeBuilder.Properties;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -18,6 +19,7 @@ namespace CustomSkillTreeBuilder
     private OpenFileDialog mOpenFileDialog;
     private string mNodeConfigPath;
     private SkillTreeComponents mSkillTreeComponents;
+    private SkillTree mSkilTree = new SkillTree();
 
     public MainViewModel()
     {
@@ -50,6 +52,25 @@ namespace CustomSkillTreeBuilder
       }
     }
 
+    public void AddComponent(Canvas canvas, string skillName)
+    {
+      if (canvas.Children.Count == 0)
+      {
+        mSkilTree = new SkillTree();
+      }
+
+      var wSkill = SkillTreeComponents.SkillFamilies.SelectMany(f => f.Skills).FirstOrDefault(s => s.Name == skillName);
+      if (wSkill == null) { return; }
+      if (!mSkilTree.Select(k => k.Name).Contains(wSkill.Name))
+      {
+        wSkill.ChildSkills = new List<Skill>();
+        mSkilTree.Add(wSkill);
+        canvas.Children.Add(new SkillControl(wSkill));
+      }
+      else
+      { MessageBox.Show("Already added"); }
+    }
+
     public ScrollViewer Menu { get; set; }
 
     public void LoadComponents()
@@ -70,27 +91,34 @@ namespace CustomSkillTreeBuilder
       }
     }
 
+    public void SaveSkillTree()
+    {
+      using (var wXmlWriter = XmlWriter.Create("asd_tree.xml",
+        new XmlWriterSettings { Indent = true, NewLineOnAttributes = true }))
+      {
+        new XmlSerializer(typeof(SkillTree)).Serialize(wXmlWriter, mSkilTree);
+      }
+    }
+
     private void BuildNodes()
     {
       SkillTreeComponents wObejct;
-
-      var wSerializer = new XmlSerializer(typeof(SkillTreeComponents));
-
-      using (var wStream = new StringReader(File.ReadAllText(mNodeConfigPath)))
-      using (var wReader = XmlReader.Create(wStream))
-      {
-        wObejct = (SkillTreeComponents)wSerializer.Deserialize(wReader);
-      }
       try
       {
-        mSkillTreeComponents = (SkillTreeComponents)wObejct;
+        var wSerializer = new XmlSerializer(typeof(SkillTreeComponents));
+
+        using (var wStream = new StringReader(File.ReadAllText(mNodeConfigPath)))
+        using (var wReader = XmlReader.Create(wStream))
+        {
+          wObejct = (SkillTreeComponents)wSerializer.Deserialize(wReader);
+        }
+        SkillTreeComponents = wObejct;
       }
       catch (Exception wException)
       {
         MessageBox.Show(wException.Message, "Xml Parsing Error");
       }
     }
-
 
     private SkillTreeComponents TestTree()
     {

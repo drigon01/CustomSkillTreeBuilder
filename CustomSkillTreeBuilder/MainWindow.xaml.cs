@@ -29,6 +29,26 @@ namespace CustomSkillTreeBuilder
       {
         wViewModel.SaveComponents();
       }
+      else
+      {
+        wViewModel.SaveSkillTree();
+      }
+    }
+
+    private void SkillSelected(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      var wViewModel = (DataContext as MainViewModel);
+      var wSkill = ((TextBlock)sender).Text;
+      switch (MessageBox.Show("Select Action, Yes=>Add, No=>Edit, Cancel=>Cancel", "Add/Edit", MessageBoxButton.YesNoCancel))
+      {
+        case MessageBoxResult.Yes:
+          wViewModel.AddComponent(mCanvas, wSkill);
+          break;
+        case MessageBoxResult.No:
+          break;
+        default:
+          break;
+      }
     }
   }
 }
