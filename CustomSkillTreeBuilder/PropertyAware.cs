@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace CustomSkillTreeBuilder
 {
-  class PropertyAware : INotifyPropertyChanged
+  public class PropertyAware : INotifyPropertyChanged
   {
     public event PropertyChangedEventHandler PropertyChanged;
 

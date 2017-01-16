@@ -23,7 +23,7 @@ namespace CustomSkillTreeBuilder
 
     public MainViewModel()
     {
-      BGImage = new BitmapImage(new Uri("bgimg.jpg", UriKind.RelativeOrAbsolute));
+      BGImage = new BitmapImage(new Uri("../../Resources/bgimg.jpg", UriKind.Relative));
       mOpenFileDialog = new OpenFileDialog();
       mOpenFileDialog.DefaultExt = "xml";
       mOpenFileDialog.InitialDirectory = Path.GetDirectoryName(
@@ -63,9 +63,9 @@ namespace CustomSkillTreeBuilder
       if (wSkill == null) { return; }
       if (!mSkilTree.Select(k => k.Name).Contains(wSkill.Name))
       {
-        wSkill.ChildSkills = new List<Skill>();
-        mSkilTree.Add(wSkill);
-        canvas.Children.Add(new SkillControl(wSkill));
+        var wUISkill = new UISkill { Effects = wSkill.Effects, Name = wSkill.Name };
+        mSkilTree.Add(wUISkill);
+        canvas.Children.Add(new SkillButton(wUISkill));
       }
       else
       { MessageBox.Show("Already added"); }
