@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Serialization;
 
 namespace CustomSkillTreeBuilder
@@ -7,9 +6,10 @@ namespace CustomSkillTreeBuilder
   /// <summary>
   /// Describes the collection of Skill families
   /// </summary>
-  public class SkillTreeComponents
+  [XmlRoot("SkillTreeComponents")]
+  public class SkillTreeComponents : List<SkillFamily>
   {
-    public List<SkillFamily> SkillFamilies { get; set; }
+
   }
 
   /// <summary>

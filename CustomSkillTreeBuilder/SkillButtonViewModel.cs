@@ -6,6 +6,8 @@ namespace CustomSkillTreeBuilder
 {
   class SkillButtonViewModel : PropertyAware
   {
+
+
     public void Initialze(UISkill skill)
     {
       Skill = skill;

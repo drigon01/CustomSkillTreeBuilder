@@ -28,14 +28,14 @@
       </MenuItem>
     </Menu>
     <TreeView x:Name="mSideMenu" Grid.Row="1" Grid.Column="0" 
-              ItemsSource="{Binding SkillTreeComponents.SkillFamilies}"
+              ItemsSource="{Binding SkillTreeComponents}"
               ScrollViewer.CanContentScroll="True">
       <TreeView.Resources>
         <HierarchicalDataTemplate DataType="{x:Type local:SkillFamily}" ItemsSource="{Binding Skills}" >
           <TextBlock Text="{Binding Name}" Margin="2"/>
         </HierarchicalDataTemplate>
         <HierarchicalDataTemplate DataType="{x:Type local:Skill}">
-          <TextBlock Text="{Binding Name}" Margin="2" MouseDown="SkillSelected" >
+          <TextBlock Text="{Binding Name}" Margin="2">
             <TextBlock.ToolTip>
               <StackPanel>
                 <ItemsControl ItemsSource="{Binding Effects}">
@@ -47,6 +47,12 @@
                 </ItemsControl>
               </StackPanel>
             </TextBlock.ToolTip>
+             <TextBlock.ContextMenu>
+               <ContextMenu>
+                 <MenuItem Header="Add" Click="OnAddSkill" CommandParameter="{Binding Name}"/>
+                 <MenuItem Header="Edit" Click="OnEditSkill"/>
+               </ContextMenu>
+             </TextBlock.ContextMenu>
           </TextBlock>
         </HierarchicalDataTemplate>
       </TreeView.Resources>

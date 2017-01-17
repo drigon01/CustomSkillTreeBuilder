@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 namespace CustomSkillTreeBuilder
 {
@@ -14,11 +11,21 @@ namespace CustomSkillTreeBuilder
   /// </summary>
   public partial class SkillButton : Button
   {
+    static RoutedEvent ConnectEvent = EventManager.RegisterRoutedEvent
+      ("Connect", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(SkillButton));
+
+
     private bool mIsDragging;
     private Canvas mParent;
     private Point mStartPosition;
     private SkillButtonViewModel ViewModel;
 
+
+    public event RoutedEventHandler Connect
+    {
+      add { AddHandler(ConnectEvent, value); }
+      remove { RemoveHandler(ConnectEvent, value); }
+    }
 
     public SkillButton(UISkill skill)
     {
@@ -38,11 +45,14 @@ namespace CustomSkillTreeBuilder
       if (mIsDragging)
       {
         var wPos = e.GetPosition(mParent);
-        var newX = wPos.X - mStartPosition.X;
-        var newY = wPos.Y - mStartPosition.Y;
+        var wX = wPos.X - mStartPosition.X;
+        var wY = wPos.Y - mStartPosition.Y;
 
-        SetValue(Canvas.TopProperty, 0 < newY && newY < mParent.ActualHeight ? newY : wPos.Y);
-        SetValue(Canvas.LeftProperty, 0 < newX && newX < mParent.ActualWidth ? newX : wPos.X);
+        ViewModel.Skill.CanvasLeft = wX;
+        ViewModel.Skill.CanvasTop = wY;
+
+        SetValue(Canvas.LeftProperty, 0 < wX && wX < mParent.ActualWidth ? wX : wPos.X);
+        SetValue(Canvas.TopProperty, 0 < wY && wY < mParent.ActualHeight ? wY : wPos.Y);
       }
       e.Handled = true;
     }
@@ -58,6 +68,11 @@ namespace CustomSkillTreeBuilder
     {
       mIsDragging = false;
       e.Handled = true;
+    }
+
+    private void OnConnect(object sender, RoutedEventArgs e)
+    {
+      RaiseEvent(new RoutedEventArgs(ConnectEvent));
     }
   }
 }

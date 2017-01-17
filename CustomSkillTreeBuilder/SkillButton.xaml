@@ -10,7 +10,7 @@
         DataContext="{StaticResource SkillButtonViewModel}"
         MouseMove="OnMouseMove"       
         Loaded="OnLoaded" 
-        RenderTransformOrigin="0.5,0.5">
+        RenderTransformOrigin="0.5,0.5" Canvas.Left="0" Canvas.Top="0">
   <Button.Template>
     <ControlTemplate >
       <Grid>
@@ -25,7 +25,7 @@
   </Button.Template>
   <Button.ContextMenu>
     <ContextMenu>
-      <MenuItem Header="Connect" />
+      <MenuItem Header="Connect" Click="OnConnect" CommandParameter="{Binding Skill.Name}"/>
       <MenuItem Header="Delete"/>
     </ContextMenu>
   </Button.ContextMenu>

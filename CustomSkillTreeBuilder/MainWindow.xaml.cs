@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace CustomSkillTreeBuilder
@@ -15,6 +16,7 @@ namespace CustomSkillTreeBuilder
     {
       InitializeComponent();
       ViewModel = (DataContext as MainViewModel);
+      ViewModel.Canvas = mCanvas;
     }
 
     private void Open_Clicked(object sender, RoutedEventArgs e)
@@ -37,19 +39,14 @@ namespace CustomSkillTreeBuilder
       }
     }
 
-    private void SkillSelected(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void OnAddSkill(object sender, RoutedEventArgs e)
     {
-      var wSkill = ((TextBlock)sender).Text;
-      switch (MessageBox.Show("Select Action, Yes=>Add, No=>Edit, Cancel=>Cancel", "Add/Edit", MessageBoxButton.YesNoCancel))
-      {
-        case MessageBoxResult.Yes:
-          ViewModel.AddComponent(mCanvas, wSkill);
-          break;
-        case MessageBoxResult.No:
-          break;
-        default:
-          break;
-      }
+      ViewModel.AddComponent((string)((MenuItem)sender).CommandParameter);
+    }
+
+    private void OnEditSkill(object sender, RoutedEventArgs e)
+    {
+      ViewModel.EditComponent((string)((MenuItem)sender).CommandParameter);
     }
   }
 }
