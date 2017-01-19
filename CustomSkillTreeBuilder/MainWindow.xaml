@@ -18,7 +18,7 @@
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="100"/>
+      <ColumnDefinition Width="120"/>
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
     <Menu IsMainMenu="True" Grid.Row="0" Grid.ColumnSpan="2">

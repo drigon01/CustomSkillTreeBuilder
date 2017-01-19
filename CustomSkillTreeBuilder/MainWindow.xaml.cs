@@ -69,18 +69,21 @@ namespace CustomSkillTreeBuilder
 
     private void OnSelectedItemChanged(object sender, RoutedEventArgs e)
     {
-      mSelectedSkillFamilyName = ((SkillFamily)(GetSelectedTreeViewItemParent(e.OriginalSource as TreeViewItem).Header)).Name;
+      var wParent = GetSelectedTreeViewItemParent(e.OriginalSource as TreeViewItem);
+      if (wParent != null)
+        mSelectedSkillFamilyName = ((SkillFamily)(wParent.Header)).Name;
     }
 
     public TreeViewItem GetSelectedTreeViewItemParent(TreeViewItem item)
     {
       DependencyObject parent = System.Windows.Media.VisualTreeHelper.GetParent(item);
-      while (!(parent is TreeViewItem || parent is TreeView))
+      while (parent != null
+        && !(parent is TreeViewItem || parent is TreeView))
       {
         parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
       }
 
-      return parent as TreeViewItem;
+      return parent == null ? null : parent as TreeViewItem;
     }
   }
 }
