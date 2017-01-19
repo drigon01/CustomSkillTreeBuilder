@@ -55,11 +55,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BooleanToVisibilityConverter.cs" />
     <Compile Include="PropertyAware.cs" />
     <Compile Include="SkillButton.xaml.cs">
       <DependentUpon>SkillButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="SkillButtonViewModel.cs" />
+    <Compile Include="SkillToMarginConverter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

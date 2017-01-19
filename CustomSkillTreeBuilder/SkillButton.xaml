@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CustomSkillTreeBuilder"
         mc:Ignorable="d" 
         d:DesignHeight="300" d:DesignWidth="300"
-        Width="64" Height="64"
+        Width="120" Height="64"
         DataContext="{StaticResource SkillButtonViewModel}"
         MouseMove="OnMouseMove"       
         Loaded="OnLoaded" 
@@ -14,12 +14,25 @@
   <Button.Template>
     <ControlTemplate >
       <Grid>
-        <Ellipse>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="64"/>
+          <ColumnDefinition Width="56"/>
+        </Grid.ColumnDefinitions>
+        <Ellipse Grid.Column="0">
           <Ellipse.Fill>
             <ImageBrush ImageSource="{Binding Image}"/>
           </Ellipse.Fill>
         </Ellipse>
-        <TextBlock Text="{Binding Skill.Name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-10" Background="White"/>
+        <StackPanel Grid.Column="1" Background="White">
+          <ItemsControl ItemsSource="{Binding Skill.Effects}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding}" Margin="10,0,0,0" TextWrapping="Wrap"/>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+        <TextBlock Grid.ColumnSpan="2" Text="{Binding Skill.Name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-10" Background="White"/>
       </Grid>
     </ControlTemplate>
   </Button.Template>

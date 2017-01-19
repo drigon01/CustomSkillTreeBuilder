@@ -9,6 +9,7 @@ namespace CustomSkillTreeBuilder
   /// </summary>
   public partial class MainWindow : Window
   {
+    string mSelectedSkillFamilyName;
 
     MainViewModel ViewModel { get; set; }
 
@@ -17,6 +18,7 @@ namespace CustomSkillTreeBuilder
       InitializeComponent();
       ViewModel = (DataContext as MainViewModel);
       ViewModel.Canvas = mCanvas;
+
     }
 
     private void Open_Clicked(object sender, RoutedEventArgs e)
@@ -41,12 +43,44 @@ namespace CustomSkillTreeBuilder
 
     private void OnAddSkill(object sender, RoutedEventArgs e)
     {
-      ViewModel.AddComponent((string)((MenuItem)sender).CommandParameter);
+      ViewModel.IsSkillContextMenuOpen = false;
+      var wSelectedItem = (Skill)mSideMenu.SelectedItem;
+      wSelectedItem.Name += "__" + mSelectedSkillFamilyName;
+      ViewModel.AddComponent(wSelectedItem);
     }
 
     private void OnEditSkill(object sender, RoutedEventArgs e)
     {
-      ViewModel.EditComponent((string)((MenuItem)sender).CommandParameter);
+      ViewModel.IsSkillContextMenuOpen = false;
+      ViewModel.EditComponent(mSideMenu.SelectedItem);
+    }
+
+    private void OnSkillSelected(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      var wSource = (e.OriginalSource as TreeViewItem);
+      ViewModel.IsSkillContextMenuOpen = true;
+    }
+
+    private void OnSkillFamilySelected(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      //((TreeViewItem)sender).IsExpanded = !((TreeViewItem)sender).IsExpanded;
+      e.Handled = true;
+    }
+
+    private void OnSelectedItemChanged(object sender, RoutedEventArgs e)
+    {
+      mSelectedSkillFamilyName = ((SkillFamily)(GetSelectedTreeViewItemParent(e.OriginalSource as TreeViewItem).Header)).Name;
+    }
+
+    public TreeViewItem GetSelectedTreeViewItemParent(TreeViewItem item)
+    {
+      DependencyObject parent = System.Windows.Media.VisualTreeHelper.GetParent(item);
+      while (!(parent is TreeViewItem || parent is TreeView))
+      {
+        parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
+      }
+
+      return parent as TreeViewItem;
     }
   }
 }

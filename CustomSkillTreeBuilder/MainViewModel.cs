@@ -1,6 +1,7 @@
 ﻿using CustomSkillTreeBuilder.Properties;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -21,16 +22,20 @@ namespace CustomSkillTreeBuilder
     private SkillTreeComponents mSkillTreeComponents;
     private SkillTree mSkilTree = new SkillTree();
     private SkillButton mSelected;
+    private bool mIsSkillContextMenuOpen;
 
     public MainViewModel()
     {
-      BGImage = new BitmapImage(new Uri("../../Resources/bgimg.jpg", UriKind.Relative));
       mOpenFileDialog = new OpenFileDialog();
       mOpenFileDialog.DefaultExt = "xml";
       mOpenFileDialog.InitialDirectory = Path.GetDirectoryName(
         System.Reflection.Assembly.GetExecutingAssembly().Location);
 
+      mIsSkillContextMenuOpen = false;
+
       mNodeConfigPath = mOpenFileDialog.InitialDirectory + "\\" + Resources.defaultFile;
+
+      BGImage = new BitmapImage(new Uri("../../Resources/bgimg.jpg", UriKind.Relative));
     }
 
     public ImageSource BGImage
@@ -40,6 +45,16 @@ namespace CustomSkillTreeBuilder
       {
         mBGImage = value;
         NotifyPropertyChanged(this.NameOf(p => p.BGImage));
+      }
+    }
+
+    public bool IsSkillContextMenuOpen
+    {
+      get { return mIsSkillContextMenuOpen; }
+      set
+      {
+        mIsSkillContextMenuOpen = value;
+        NotifyPropertyChanged(this.NameOf(p => p.IsSkillContextMenuOpen));
       }
     }
 
@@ -53,14 +68,14 @@ namespace CustomSkillTreeBuilder
       }
     }
 
-    public void AddComponent(string skillName)
+    public void AddComponent(Skill skill)
     {
       if (Canvas.Children.Count == 0)
       {
         mSkilTree = new SkillTree();
       }
 
-      var wSkill = SkillTreeComponents.SelectMany(f => f.Skills).FirstOrDefault(s => s.Name == skillName);
+      var wSkill = SkillTreeComponents.SelectMany(f => f.Skills).FirstOrDefault(s => s.Name == skill.Name);
       if (wSkill == null) { return; }
       if (!mSkilTree.Select(k => k.Name).Contains(wSkill.Name))
       {
@@ -69,10 +84,36 @@ namespace CustomSkillTreeBuilder
 
         var wButton = new SkillButton(wUISkill);
         wButton.Connect += OnConnect;
+        wButton.Moving += OnDraggingSkill;
+
         Canvas.Children.Add(wButton);
       }
       else
       { MessageBox.Show("Already added"); }
+    }
+
+    private void OnDraggingSkill(object sender, RoutedEventArgs e)
+    {
+      var wButton = (SkillButton)sender;
+      var wCenter = GetButtonCenterPosition(wButton);
+
+      foreach (var wUiElement in Canvas.Children)
+      {
+        var wLine = wUiElement as System.Windows.Shapes.Line;
+        if (wLine != null && wLine.Name.Contains(wButton.Name))
+        {
+          if (wLine.Name.StartsWith(wButton.Name))
+          {
+            wLine.X1 = wCenter.X;
+            wLine.Y1 = wCenter.Y;
+          }
+          else
+          {
+            wLine.X2 = wCenter.X;
+            wLine.Y2 = wCenter.Y;
+          }
+        }
+      }
     }
 
     private void OnConnect(object sender, RoutedEventArgs e)
@@ -85,7 +126,7 @@ namespace CustomSkillTreeBuilder
       {
         var wPos1 = GetButtonCenterPosition(mSelected);
         var wPos2 = GetButtonCenterPosition((SkillButton)sender);
-        Canvas.Children.Add(
+        var wConnector =
           new System.Windows.Shapes.Line
           {
             X1 = wPos1.X,
@@ -93,8 +134,13 @@ namespace CustomSkillTreeBuilder
             X2 = wPos2.X,
             Y2 = wPos2.Y,
             Stroke = new SolidColorBrush(Color.FromRgb(200, 200, 200)),
-            StrokeThickness = 2
-          });
+            StrokeThickness = 2,
+            Name = string.Format("{0}_{1}", mSelected.Name, ((SkillButton)sender).Name)
+          };
+
+        Canvas.Children.Add(wConnector);
+        Panel.SetZIndex(wConnector, 0);
+
         mSelected = null;
       }
     }
@@ -111,6 +157,17 @@ namespace CustomSkillTreeBuilder
     }
 
     public ScrollViewer Menu { get; set; }
+
+    public string mSelectedSkillName;
+    public string SelectedSkillName
+    {
+      get { return mSelectedSkillName; }
+      internal set
+      {
+        mSelectedSkillName = value;
+        NotifyPropertyChanged(this.NameOf(p => p.SelectedSkillName));
+      }
+    }
 
     public void LoadComponents()
     {
