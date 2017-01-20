@@ -74,7 +74,25 @@
         <Button Content="Add" Height="25" Width="60" Click="OnAddSkill"/>
         <Button Content="Edit" Height="25" Width="60" Click="OnEditSkill"/>
       </DockPanel>
-    </Canvas>
+      <DockPanel Dock= "Bottom"
+                 Visibility="{Binding IsAddNewSkillFamilyDialogOpen, Converter={StaticResource ResourceKey=BooleanToVisibilityConverter}}">
+        <DockPanel.Margin>
+          <MultiBinding Converter="{StaticResource SkillToMarginConverter}">
+            <Binding Path="ActualHeight" ElementName="mSideMenu" />
+            <Binding Path="SelectedItem" ElementName="mSideMenu"/>
+            <Binding Path="Items" ElementName="mSideMenu"/>
+          </MultiBinding>
+        </DockPanel.Margin>
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="60"/>
+            <ColumnDefinition Width="60"/>
+          </Grid.ColumnDefinitions>
+          <TextBox x:Name="mNewName" Grid.Column="0" Text="Enter Name here" Height="25" Width="60"/>
+          <Button Grid.Column="1" Content="Add" Height="25" Width="60" Click="AddNewFamily"/>
+        </Grid>
+      </DockPanel>
 
+    </Canvas>
   </Grid>
 </Window>

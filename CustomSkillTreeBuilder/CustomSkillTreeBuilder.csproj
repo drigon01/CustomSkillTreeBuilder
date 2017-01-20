@@ -56,7 +56,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BooleanToVisibilityConverter.cs" />
-    <Compile Include="PropertyAware.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="SkillButton.xaml.cs">
       <DependentUpon>SkillButton.xaml</DependentUpon>
     </Compile>

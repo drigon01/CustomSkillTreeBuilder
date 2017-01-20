@@ -18,23 +18,33 @@ namespace CustomSkillTreeBuilder
     internal Canvas Canvas;
     private ImageSource mBGImage;
     private OpenFileDialog mOpenFileDialog;
+    private SaveFileDialog mSaveFileDialog;
+    public string mSelectedSkillName;
     private string mNodeConfigPath;
+    private bool mIsSkillContextMenuOpen;
+    private bool mIsAddNewSkillFamilyDialogVisible;
     private SkillTreeComponents mSkillTreeComponents;
     private SkillTree mSkilTree = new SkillTree();
     private SkillButton mSelected;
-    private bool mIsSkillContextMenuOpen;
+
+    private readonly SkillFamily mAddSkillFamily = new SkillFamily { Name = Resources.AddNew };
+    private readonly Skill mAddSkill = new Skill
+    {
+      Name = Resources.AddNew,
+      Effects = new[] { "By clicking this you can add a new skill under this family." }
+    };
 
     public MainViewModel()
     {
       mOpenFileDialog = new OpenFileDialog();
-      mOpenFileDialog.DefaultExt = "xml";
-      mOpenFileDialog.InitialDirectory = Path.GetDirectoryName(
+      mSaveFileDialog = new SaveFileDialog();
+      mSaveFileDialog.DefaultExt = mOpenFileDialog.DefaultExt = "xml";
+      mSaveFileDialog.InitialDirectory = mOpenFileDialog.InitialDirectory = Path.GetDirectoryName(
         System.Reflection.Assembly.GetExecutingAssembly().Location);
 
       mIsSkillContextMenuOpen = false;
 
       mNodeConfigPath = mOpenFileDialog.InitialDirectory + "\\" + Resources.defaultFile;
-
       BGImage = new BitmapImage(new Uri("../../Resources/bgimg.jpg", UriKind.Relative));
     }
 
@@ -58,6 +68,16 @@ namespace CustomSkillTreeBuilder
       }
     }
 
+    public bool IsAddNewSkillFamilyDialogOpen
+    {
+      get { return mIsAddNewSkillFamilyDialogVisible; }
+      set
+      {
+        mIsAddNewSkillFamilyDialogVisible = value;
+        NotifyPropertyChanged(this.NameOf(p => p.IsAddNewSkillFamilyDialogOpen));
+      }
+    }
+
     public SkillTreeComponents SkillTreeComponents
     {
       get { return mSkillTreeComponents; }
@@ -68,7 +88,7 @@ namespace CustomSkillTreeBuilder
       }
     }
 
-    public void AddComponent(Skill skill)
+    public void AddSkill(Skill skill)
     {
       if (Canvas.Children.Count == 0)
       {
@@ -147,8 +167,8 @@ namespace CustomSkillTreeBuilder
 
     private Point GetButtonCenterPosition(Button button)
     {
-      return new Point(Canvas.GetLeft(button) + 32
-        , Canvas.GetTop(button) + 32);
+      return new Point(Canvas.GetLeft(button) + button.ActualWidth / 2
+        , Canvas.GetTop(button) + button.ActualHeight / 2);
     }
 
     internal void EditComponent(object wSkill)
@@ -156,9 +176,6 @@ namespace CustomSkillTreeBuilder
       throw new NotImplementedException();
     }
 
-    public ScrollViewer Menu { get; set; }
-
-    public string mSelectedSkillName;
     public string SelectedSkillName
     {
       get { return mSelectedSkillName; }
@@ -178,12 +195,17 @@ namespace CustomSkillTreeBuilder
 
     public void SaveComponents()
     {
-      var wObject = TestTree();
+      var wList = SkillTreeComponents;
+      wList.Remove(mAddSkillFamily);
+      wList.ForEach(f => f.Skills.Remove(mAddSkill));
 
-      using (var wXmlWriter = XmlWriter.Create("asd.xml",
-        new XmlWriterSettings { Indent = true, NewLineOnAttributes = true }))
+      if (mSaveFileDialog.ShowDialog() == true)
       {
-        new XmlSerializer(typeof(SkillTreeComponents)).Serialize(wXmlWriter, wObject);
+        using (var wXmlWriter = XmlWriter.Create(mSaveFileDialog.FileName,
+        new XmlWriterSettings { Indent = true, NewLineOnAttributes = true }))
+        {
+          new XmlSerializer(typeof(SkillTreeComponents)).Serialize(wXmlWriter, wList);
+        }
       }
     }
 
@@ -208,7 +230,9 @@ namespace CustomSkillTreeBuilder
         {
           wObejct = (SkillTreeComponents)wSerializer.Deserialize(wReader);
         }
+        wObejct.Add(mAddSkillFamily);
         SkillTreeComponents = wObejct;
+        SkillTreeComponents.ForEach(f => f.Skills.Add(mAddSkill));
       }
       catch (Exception wException)
       {
@@ -216,19 +240,40 @@ namespace CustomSkillTreeBuilder
       }
     }
 
-    private SkillTreeComponents TestTree()
+    public void AddNewComponent(SkillFamily family)
     {
-      return new SkillTreeComponents
+      if (family is SkillFamily && family.Skills == null)
       {
-        new SkillFamily {Name="test",
-            Skills = new System.Collections.Generic.List<Skill>
-            {
-              new Skill { Name="TestSkill",
-                Effects = new[] {"ability1","ability2" } }
-            }
-        }
-      };
+        var wComponents = SkillTreeComponents;
+        wComponents.Add(family);
+        SkillTreeComponents.Clear();
+        SkillTreeComponents = wComponents;
+        IsAddNewSkillFamilyDialogOpen = false;
+      }
+      else if (family is SkillFamily && SkillTreeComponents.Contains(family,
+        new EqualityComparer<SkillFamily>((f1, f2) => f1.Name == f2.Name)))
+      {
+        SkillTreeComponents.FirstOrDefault(f => f.Name == family.Name).Skills.AddRange(family.Skills);
+      }
+      else
+      {
+        IsAddNewSkillFamilyDialogOpen = true;
+      }
     }
+
+    /* private SkillTreeComponents TestTree()
+     {
+       return new SkillTreeComponents
+       {
+         new SkillFamily {Name="test",
+             Skills = new System.Collections.Generic.List<Skill>
+             {
+               new Skill { Name="TestSkill",
+                 Effects = new[] {"ability1","ability2" } }
+             }
+         }
+       };
+     }*/
   }
 }
 

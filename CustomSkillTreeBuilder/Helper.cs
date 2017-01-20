@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
@@ -25,7 +26,7 @@ namespace CustomSkillTreeBuilder
       return body.Member.Name;
     }
 
-    public static T FindParent<T>(DependencyObject child) where T : DependencyObject
+    public static T FindParent<T>(this DependencyObject child) where T : DependencyObject
     {
       //get parent item
       DependencyObject parentObject = VisualTreeHelper.GetParent(child);
@@ -41,5 +42,13 @@ namespace CustomSkillTreeBuilder
         //enter recursion
         return FindParent<T>(parentObject);
     }
+  }
+
+  public class EqualityComparer<T> : IEqualityComparer<T>
+  {
+    public EqualityComparer(Func<T, T, bool> cmp) { Compare = cmp; }
+    public bool Equals(T x, T y) { return Compare(x, y); }
+    public int GetHashCode(T obj) { return obj.GetHashCode(); }
+    public Func<T, T, bool> Compare { get; set; }
   }
 }

@@ -7,10 +7,7 @@ namespace CustomSkillTreeBuilder
   /// Describes the collection of Skill families
   /// </summary>
   [XmlRoot("SkillTreeComponents")]
-  public class SkillTreeComponents : List<SkillFamily>
-  {
-
-  }
+  public class SkillTreeComponents : List<SkillFamily> { }
 
   /// <summary>
   /// Describes a Skill family

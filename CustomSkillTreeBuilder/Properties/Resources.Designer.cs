@@ -61,6 +61,15 @@ namespace CustomSkillTreeBuilder.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to + Add New.
+        /// </summary>
+        internal static string AddNew {
+            get {
+                return ResourceManager.GetString("AddNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to defaultNodes.xml.
         /// </summary>
         internal static string defaultFile {

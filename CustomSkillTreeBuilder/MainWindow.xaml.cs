@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -46,7 +47,7 @@ namespace CustomSkillTreeBuilder
       ViewModel.IsSkillContextMenuOpen = false;
       var wSelectedItem = (Skill)mSideMenu.SelectedItem;
       wSelectedItem.Name += "__" + mSelectedSkillFamilyName;
-      ViewModel.AddComponent(wSelectedItem);
+      ViewModel.AddSkill(wSelectedItem);
     }
 
     private void OnEditSkill(object sender, RoutedEventArgs e)
@@ -57,33 +58,38 @@ namespace CustomSkillTreeBuilder
 
     private void OnSkillSelected(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-      var wSource = (e.OriginalSource as TreeViewItem);
-      ViewModel.IsSkillContextMenuOpen = true;
+      if (((TextBlock)sender).Text == Properties.Resources.AddNew)
+      {
+        ViewModel.AddNewComponent(new SkillFamily
+        {
+          Skills = new List<Skill>() { ((Skill)mSideMenu.SelectedItem) },
+          Name = mSelectedSkillFamilyName
+        });
+      }
+      else { ViewModel.IsSkillContextMenuOpen = true; }
     }
 
     private void OnSkillFamilySelected(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-      //((TreeViewItem)sender).IsExpanded = !((TreeViewItem)sender).IsExpanded;
-      e.Handled = true;
+      var wFamilyName = ((TextBlock)sender).Text;
+      if (wFamilyName == Properties.Resources.AddNew)
+      {
+        ViewModel.AddNewComponent(null);
+      }
+      else { e.Handled = true; }
     }
 
     private void OnSelectedItemChanged(object sender, RoutedEventArgs e)
     {
-      var wParent = GetSelectedTreeViewItemParent(e.OriginalSource as TreeViewItem);
-      if (wParent != null)
+      var wParent = (e.OriginalSource as DependencyObject).FindParent<TreeViewItem>();
+      if (wParent is TreeViewItem)
         mSelectedSkillFamilyName = ((SkillFamily)(wParent.Header)).Name;
     }
 
-    public TreeViewItem GetSelectedTreeViewItemParent(TreeViewItem item)
+    private void AddNewFamily(object sender, RoutedEventArgs e)
     {
-      DependencyObject parent = System.Windows.Media.VisualTreeHelper.GetParent(item);
-      while (parent != null
-        && !(parent is TreeViewItem || parent is TreeView))
-      {
-        parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
-      }
-
-      return parent == null ? null : parent as TreeViewItem;
+      ViewModel.AddNewComponent(new SkillFamily { Name = mNewName.Text });
+      mSelectedSkillFamilyName = mNewName.Text;
     }
   }
 }
