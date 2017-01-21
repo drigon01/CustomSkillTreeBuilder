@@ -8,7 +8,7 @@
              mc:Ignorable="d" Padding="30" HorizontalAlignment="Center"
              d:DesignHeight="300" d:DesignWidth="300" >
   <local:DragableControlBase.Background>
-    <RadialGradientBrush Opacity="0.65">
+    <RadialGradientBrush Opacity="0.65" RadiusY="100" >
       <GradientStop Color="Navy" Offset="0"/>
       <GradientStop Color="Black" Offset="0.9"/>
       <GradientStop Color="#00000044" Offset="1" />
