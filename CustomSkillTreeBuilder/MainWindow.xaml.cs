@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -19,7 +18,6 @@ namespace CustomSkillTreeBuilder
       InitializeComponent();
       ViewModel = (DataContext as MainViewModel);
       ViewModel.Canvas = mCanvas;
-
     }
 
     private void Open_Clicked(object sender, RoutedEventArgs e)
@@ -44,39 +42,33 @@ namespace CustomSkillTreeBuilder
 
     private void OnAddSkill(object sender, RoutedEventArgs e)
     {
-      ViewModel.IsSkillContextMenuOpen = false;
-      var wSelectedItem = (Skill)mSideMenu.SelectedItem;
-      wSelectedItem.Name += "__" + mSelectedSkillFamilyName;
-      ViewModel.AddSkill(wSelectedItem);
+      if (mSideMenu.SelectedItem is Skill)
+      {
+        var wSelectedItem = (Skill)mSideMenu.SelectedItem;
+        wSelectedItem.Name += "__" + mSelectedSkillFamilyName;
+        ViewModel.AddSkill(wSelectedItem);
+      }
     }
 
     private void OnEditSkill(object sender, RoutedEventArgs e)
     {
-      ViewModel.IsSkillContextMenuOpen = false;
+      ViewModel.IsContextMenuOpen = false;
       ViewModel.EditComponent(mSideMenu.SelectedItem);
     }
 
     private void OnSkillSelected(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-      if (((TextBlock)sender).Text == Properties.Resources.AddNew)
+      if (!AddNewCompnent(((TextBlock)sender).Text, "Skill"))
       {
-        ViewModel.AddNewComponent(new SkillFamily
-        {
-          Skills = new List<Skill>() { ((Skill)mSideMenu.SelectedItem) },
-          Name = mSelectedSkillFamilyName
-        });
+        ViewModel.Context = "Skill";
+        ViewModel.IsContextMenuOpen = true;
       }
-      else { ViewModel.IsSkillContextMenuOpen = true; }
     }
 
     private void OnSkillFamilySelected(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-      var wFamilyName = ((TextBlock)sender).Text;
-      if (wFamilyName == Properties.Resources.AddNew)
-      {
-        ViewModel.AddNewComponent(null);
-      }
-      else { e.Handled = true; }
+      if (!AddNewCompnent(((TextBlock)sender).Text, "Family"))
+        e.Handled = true;
     }
 
     private void OnSelectedItemChanged(object sender, RoutedEventArgs e)
@@ -88,8 +80,29 @@ namespace CustomSkillTreeBuilder
 
     private void AddNewFamily(object sender, RoutedEventArgs e)
     {
-      ViewModel.AddNewComponent(new SkillFamily { Name = mNewName.Text });
-      mSelectedSkillFamilyName = mNewName.Text;
+      var wArgs = (SkillFamilyAdditionEventArgs)e;
+      ViewModel.AddNewComponent(new SkillFamily { Name = wArgs.Name });
+      mSelectedSkillFamilyName = wArgs.Name;
+    }
+
+    private bool AddNewCompnent(string text, string type)
+    {
+      if (text == Properties.Resources.AddNew)
+      {
+        ViewModel.AddNewComponent(type == "Skill" ? new SkillFamily
+        {
+          Skills = new List<Skill>(),
+          Name = mSelectedSkillFamilyName
+        } : null);
+        return true;
+      }
+      return false;
+    }
+
+    private void mCanvas_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+      ViewModel.Context = null;
+      ViewModel.IsContextMenuOpen = false;
     }
   }
 }

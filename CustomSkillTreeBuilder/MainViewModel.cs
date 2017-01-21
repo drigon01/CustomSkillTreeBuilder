@@ -1,7 +1,7 @@
 ﻿using CustomSkillTreeBuilder.Properties;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -21,11 +21,11 @@ namespace CustomSkillTreeBuilder
     private SaveFileDialog mSaveFileDialog;
     public string mSelectedSkillName;
     private string mNodeConfigPath;
-    private bool mIsSkillContextMenuOpen;
-    private bool mIsAddNewSkillFamilyDialogVisible;
-    private SkillTreeComponents mSkillTreeComponents;
+    private bool mIsContextMenuOpen;
+    private ObservableCollection<SkillFamily> mSkillTreeComponents;
     private SkillTree mSkilTree = new SkillTree();
     private SkillButton mSelected;
+    private object mContext;
 
     private readonly SkillFamily mAddSkillFamily = new SkillFamily { Name = Resources.AddNew };
     private readonly Skill mAddSkill = new Skill
@@ -42,7 +42,7 @@ namespace CustomSkillTreeBuilder
       mSaveFileDialog.InitialDirectory = mOpenFileDialog.InitialDirectory = Path.GetDirectoryName(
         System.Reflection.Assembly.GetExecutingAssembly().Location);
 
-      mIsSkillContextMenuOpen = false;
+      mIsContextMenuOpen = false;
 
       mNodeConfigPath = mOpenFileDialog.InitialDirectory + "\\" + Resources.defaultFile;
       BGImage = new BitmapImage(new Uri("../../Resources/bgimg.jpg", UriKind.Relative));
@@ -58,27 +58,27 @@ namespace CustomSkillTreeBuilder
       }
     }
 
-    public bool IsSkillContextMenuOpen
+    public bool IsContextMenuOpen
     {
-      get { return mIsSkillContextMenuOpen; }
+      get { return mIsContextMenuOpen; }
       set
       {
-        mIsSkillContextMenuOpen = value;
-        NotifyPropertyChanged(this.NameOf(p => p.IsSkillContextMenuOpen));
+        mIsContextMenuOpen = value;
+        NotifyPropertyChanged(this.NameOf(p => p.IsContextMenuOpen));
       }
     }
 
-    public bool IsAddNewSkillFamilyDialogOpen
+    public object Context
     {
-      get { return mIsAddNewSkillFamilyDialogVisible; }
+      get { return mContext; }
       set
       {
-        mIsAddNewSkillFamilyDialogVisible = value;
-        NotifyPropertyChanged(this.NameOf(p => p.IsAddNewSkillFamilyDialogOpen));
+        mContext = value;
+        NotifyPropertyChanged(this.NameOf(p => p.Context));
       }
     }
 
-    public SkillTreeComponents SkillTreeComponents
+    public ObservableCollection<SkillFamily> SkillTreeComponents
     {
       get { return mSkillTreeComponents; }
       set
@@ -94,6 +94,8 @@ namespace CustomSkillTreeBuilder
       {
         mSkilTree = new SkillTree();
       }
+      Context = null;
+      IsContextMenuOpen = false;
 
       var wSkill = SkillTreeComponents.SelectMany(f => f.Skills).FirstOrDefault(s => s.Name == skill.Name);
       if (wSkill == null) { return; }
@@ -197,14 +199,19 @@ namespace CustomSkillTreeBuilder
     {
       var wList = SkillTreeComponents;
       wList.Remove(mAddSkillFamily);
-      wList.ForEach(f => f.Skills.Remove(mAddSkill));
+      var wSkillTreeComponents = new SkillTreeComponents();
+      foreach (var family in wList)
+      {
+        family.Skills.Remove(mAddSkill);
+        wSkillTreeComponents.Add(family);
+      }
 
       if (mSaveFileDialog.ShowDialog() == true)
       {
         using (var wXmlWriter = XmlWriter.Create(mSaveFileDialog.FileName,
         new XmlWriterSettings { Indent = true, NewLineOnAttributes = true }))
         {
-          new XmlSerializer(typeof(SkillTreeComponents)).Serialize(wXmlWriter, wList);
+          new XmlSerializer(typeof(SkillTreeComponents)).Serialize(wXmlWriter, wSkillTreeComponents);
         }
       }
     }
@@ -230,9 +237,13 @@ namespace CustomSkillTreeBuilder
         {
           wObejct = (SkillTreeComponents)wSerializer.Deserialize(wReader);
         }
+
+        wObejct.ForEach(f => f.Skills.Add(mAddSkill));
         wObejct.Add(mAddSkillFamily);
-        SkillTreeComponents = wObejct;
-        SkillTreeComponents.ForEach(f => f.Skills.Add(mAddSkill));
+
+        SkillTreeComponents = new ObservableCollection<SkillFamily>();
+        wObejct.ForEach(f => SkillTreeComponents.Add(f));
+
       }
       catch (Exception wException)
       {
@@ -244,36 +255,25 @@ namespace CustomSkillTreeBuilder
     {
       if (family is SkillFamily && family.Skills == null)
       {
-        var wComponents = SkillTreeComponents;
-        wComponents.Add(family);
-        SkillTreeComponents.Clear();
-        SkillTreeComponents = wComponents;
-        IsAddNewSkillFamilyDialogOpen = false;
+        family.Skills = new System.Collections.Generic.List<Skill> { mAddSkill };
+        SkillTreeComponents.Remove(SkillTreeComponents.Last());
+        SkillTreeComponents.Add(family);
+        SkillTreeComponents.Add(mAddSkillFamily);
+
+        IsContextMenuOpen = false;
       }
       else if (family is SkillFamily && SkillTreeComponents.Contains(family,
         new EqualityComparer<SkillFamily>((f1, f2) => f1.Name == f2.Name)))
       {
-        SkillTreeComponents.FirstOrDefault(f => f.Name == family.Name).Skills.AddRange(family.Skills);
+        Context = "NewSkill";
+        IsContextMenuOpen = true;
       }
       else
       {
-        IsAddNewSkillFamilyDialogOpen = true;
+        Context = "NewFamily";
+        IsContextMenuOpen = true;
       }
     }
-
-    /* private SkillTreeComponents TestTree()
-     {
-       return new SkillTreeComponents
-       {
-         new SkillFamily {Name="test",
-             Skills = new System.Collections.Generic.List<Skill>
-             {
-               new Skill { Name="TestSkill",
-                 Effects = new[] {"ability1","ability2" } }
-             }
-         }
-       };
-     }*/
   }
 }
 

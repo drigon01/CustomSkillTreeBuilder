@@ -56,11 +56,16 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BooleanToVisibilityConverter.cs" />
+    <Compile Include="DragableControlBase.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="SkillButton.xaml.cs">
       <DependentUpon>SkillButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="SkillButtonViewModel.cs" />
+    <Compile Include="SkillDialog.xaml.cs">
+      <DependentUpon>SkillDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SkillDialogViewModel.cs" />
     <Compile Include="SkillToMarginConverter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -76,6 +81,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="SkillButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SkillDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

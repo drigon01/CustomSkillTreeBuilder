@@ -38,8 +38,8 @@
   </Button.Template>
   <Button.ContextMenu>
     <ContextMenu>
-      <MenuItem Header="Connect" Click="OnConnect" CommandParameter="{Binding Skill.Name}"/>
-      <MenuItem Header="Delete"/>
+      <MenuItem Header="Connect" Click="OnConnect"/>
+      <MenuItem Header="Delete" Click="OnDelete"/>
     </ContextMenu>
   </Button.ContextMenu>
 </Button>

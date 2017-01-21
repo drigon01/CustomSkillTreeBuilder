@@ -6,5 +6,6 @@
   <Application.Resources>
     <local:MainViewModel x:Key="MainViewModel" />
     <local:SkillButtonViewModel x:Key="SkillButtonViewModel"/>
+    <local:SkillDialogViewModel x:Key="SkillDialogViewModel"/>
   </Application.Resources>
 </Application>

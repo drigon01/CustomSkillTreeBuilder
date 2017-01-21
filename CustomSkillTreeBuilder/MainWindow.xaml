@@ -6,12 +6,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CustomSkillTreeBuilder"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525"
+        Title="Skill Tree Builder" Height="600" Width="800"
         DataContext="{StaticResource MainViewModel}">
   <Window.Resources>
     <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <local:SkillToMarginConverter x:Key="SkillToMarginConverter"/>
   </Window.Resources>
+  <Window.Background>
+    <ImageBrush ImageSource="{Binding BGImage}" Stretch="UniformToFill"/>
+  </Window.Background>
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="24"/>
@@ -26,22 +29,30 @@
         <MenuItem CommandParameter="Components" Header="_Open" Click="Open_Clicked"/>
         <MenuItem CommandParameter="Components" Header="_Save" Click="Save_Clicked"/>
       </MenuItem>
+      <Separator/>
       <MenuItem Header="SkillTree">
         <MenuItem CommandParameter="SkillTree" Header="_Open" Click="Open_Clicked"/>
         <MenuItem CommandParameter="SkillTree" Header="_Save" Click="Save_Clicked"/>
         <MenuItem Header="Print" />
       </MenuItem>
     </Menu>
-    <TreeView x:Name="mSideMenu" Grid.Row="1" Grid.Column="0" 
-              ItemsSource="{Binding SkillTreeComponents}"
+    <TreeView x:Name="mSideMenu" Grid.Row="1" Grid.Column="0"
+              ItemsSource="{Binding SkillTreeComponents}" FontFamily="Arial" FontWeight="DemiBold"
               ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Hidden" 
-              TreeViewItem.Selected="OnSelectedItemChanged">
+              TreeViewItem.Selected="OnSelectedItemChanged" BorderThickness="0">
+      <TreeView.Background>
+        <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5" Opacity="0.65">
+          <GradientStop Color="Navy" Offset="0"/>
+          <GradientStop Color="Black" Offset="0.9"/>
+          <GradientStop Color="#00000044" Offset="1" />
+        </LinearGradientBrush>
+      </TreeView.Background>
       <TreeView.Resources>
         <HierarchicalDataTemplate DataType="{x:Type local:SkillFamily}" ItemsSource="{Binding Skills}">
-          <TextBlock Text="{Binding Name}" Margin="2" MouseDown="OnSkillFamilySelected" />
+          <TextBlock Text="{Binding Name}" Margin="2" MouseDown="OnSkillFamilySelected" Foreground="White"/>
         </HierarchicalDataTemplate>
         <HierarchicalDataTemplate DataType="{x:Type local:Skill}">
-          <TextBlock Text="{Binding Name}" Margin="2" MouseDown="OnSkillSelected" x:Name="mSkillName">
+          <TextBlock Text="{Binding Name}" Margin="2" MouseDown="OnSkillSelected" x:Name="mSkillName" Foreground="DodgerBlue">
             <TextBlock.ToolTip>
               <StackPanel>
                 <ItemsControl ItemsSource="{Binding Effects}">
@@ -57,42 +68,17 @@
         </HierarchicalDataTemplate>
       </TreeView.Resources>
     </TreeView>
-    <Canvas Grid.Row="1" Grid.Column="1"
-            x:Name="mCanvas">
-      <Canvas.Background>
-        <ImageBrush ImageSource="{Binding BGImage}"/>
-      </Canvas.Background>
-      <DockPanel Dock= "Bottom"
-                 Visibility="{Binding IsSkillContextMenuOpen, Converter={StaticResource ResourceKey=BooleanToVisibilityConverter}}">
-        <DockPanel.Margin>
+    <Canvas Grid.Row="1" Grid.Column="1" x:Name="mCanvas" MouseLeftButtonDown="mCanvas_MouseLeftButtonDown">
+      <local:SkillDialog Tag="{Binding Context}" AddFamily="AddNewFamily" EditSkill="OnEditSkill" AddSkill="OnAddSkill"
+        Visibility="{Binding IsContextMenuOpen, Converter={StaticResource ResourceKey=BooleanToVisibilityConverter}, FallbackValue=Hidden}">
+        <local:SkillDialog.Margin>
           <MultiBinding Converter="{StaticResource SkillToMarginConverter}">
             <Binding Path="ActualHeight" ElementName="mSideMenu" />
             <Binding Path="SelectedItem" ElementName="mSideMenu"/>
             <Binding Path="Items" ElementName="mSideMenu"/>
           </MultiBinding>
-        </DockPanel.Margin>
-        <Button Content="Add" Height="25" Width="60" Click="OnAddSkill"/>
-        <Button Content="Edit" Height="25" Width="60" Click="OnEditSkill"/>
-      </DockPanel>
-      <DockPanel Dock= "Bottom"
-                 Visibility="{Binding IsAddNewSkillFamilyDialogOpen, Converter={StaticResource ResourceKey=BooleanToVisibilityConverter}}">
-        <DockPanel.Margin>
-          <MultiBinding Converter="{StaticResource SkillToMarginConverter}">
-            <Binding Path="ActualHeight" ElementName="mSideMenu" />
-            <Binding Path="SelectedItem" ElementName="mSideMenu"/>
-            <Binding Path="Items" ElementName="mSideMenu"/>
-          </MultiBinding>
-        </DockPanel.Margin>
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="60"/>
-            <ColumnDefinition Width="60"/>
-          </Grid.ColumnDefinitions>
-          <TextBox x:Name="mNewName" Grid.Column="0" Text="Enter Name here" Height="25" Width="60"/>
-          <Button Grid.Column="1" Content="Add" Height="25" Width="60" Click="AddNewFamily"/>
-        </Grid>
-      </DockPanel>
-
+        </local:SkillDialog.Margin>
+      </local:SkillDialog>
     </Canvas>
   </Grid>
 </Window>

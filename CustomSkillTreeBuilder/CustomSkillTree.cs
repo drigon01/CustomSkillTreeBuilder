@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace CustomSkillTreeBuilder
@@ -12,10 +14,25 @@ namespace CustomSkillTreeBuilder
   /// <summary>
   /// Describes a Skill family
   /// </summary>
-  public class SkillFamily
+  public class SkillFamily : IEquatable<SkillFamily>
   {
     public string Name { get; set; }
     public List<Skill> Skills { get; set; }
+
+    public SkillFamily Copy()
+    {
+      var wCopy = new SkillFamily();
+      wCopy.Name = this.Name;
+      wCopy.Skills = this.Skills;
+
+      return wCopy;
+    }
+
+    public bool Equals(SkillFamily other)
+    {
+      return Name == other.Name && ((other.Skills == null && Skills == null) ||
+        !(other.Skills == null || Skills == null) && Skills.SequenceEqual(other.Skills));
+    }
   }
 
   /// <summary>

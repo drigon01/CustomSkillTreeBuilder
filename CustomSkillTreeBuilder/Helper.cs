@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace CustomSkillTreeBuilder
@@ -28,13 +30,10 @@ namespace CustomSkillTreeBuilder
 
     public static T FindParent<T>(this DependencyObject child) where T : DependencyObject
     {
-      //get parent item
       DependencyObject parentObject = VisualTreeHelper.GetParent(child);
 
-      //we've reached the end of the tree
       if (parentObject == null) return null;
 
-      //check if the parent matches the type we're looking for
       T parent = parentObject as T;
       if (parent != null)
         return parent;
@@ -42,6 +41,21 @@ namespace CustomSkillTreeBuilder
         //enter recursion
         return FindParent<T>(parentObject);
     }
+
+    public static Point DragOnCanvas<T>(this T o, Canvas parent, Point startPoint, MouseEventArgs args) where T : DependencyObject
+    {
+      var wPos = args.GetPosition(parent);
+      var wX = wPos.X - startPoint.X;
+      var wY = wPos.Y - startPoint.Y;
+
+      o.SetValue(Canvas.LeftProperty, 0 < wX && wX < parent.ActualWidth ? wX : wPos.X);
+      o.SetValue(Canvas.TopProperty, 0 < wY && wY < parent.ActualHeight ? wY : wPos.Y);
+
+      return
+        new Point((double)o.GetValue(Canvas.LeftProperty),
+        (double)o.GetValue(Canvas.TopProperty));
+    }
+
   }
 
   public class EqualityComparer<T> : IEqualityComparer<T>
