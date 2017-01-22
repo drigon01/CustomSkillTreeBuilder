@@ -20,7 +20,6 @@ namespace CustomSkillTreeBuilder
     private OpenFileDialog mOpenFileDialog;
     private SaveFileDialog mSaveFileDialog;
     public string mSelectedSkillName;
-    private string mNodeConfigPath;
     private bool mIsContextMenuOpen;
     private ObservableCollection<SkillFamily> mSkillTreeComponents;
 
@@ -341,7 +340,7 @@ namespace CustomSkillTreeBuilder
         new EqualityComparer<SkillFamily>((f1, f2) => f1.Name == f2.Name)))
       {
         Context = "NewSkill";
-        
+
         IsContextMenuOpen = true;
       }
       else

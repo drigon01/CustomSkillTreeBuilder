@@ -20,6 +20,7 @@ namespace CustomSkillTreeBuilder
 
     private bool mIsDragging;
     private Canvas mParent;
+    private UISkill mSkill;
     private Point mStartPosition;
     private SkillButtonViewModel ViewModel;
 
@@ -43,17 +44,19 @@ namespace CustomSkillTreeBuilder
 
     public SkillButton(UISkill skill)
     {
+      mSkill = skill;
       Name = skill.Name;
       InitializeComponent();
       mIsDragging = false;
-      ViewModel = (DataContext as SkillButtonViewModel);
-      ViewModel.Initialze(skill);
+      DataContext = ViewModel = new SkillButtonViewModel(mSkill);
+
       SetValue(Canvas.ZIndexProperty, 800);
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
       mParent = (Canvas)Parent;
+
       var wX = ViewModel.Skill.CanvasLeft > 0 ? ViewModel.Skill.CanvasLeft : (mParent.ActualWidth / 2) - (ActualWidth);
       var wY = ViewModel.Skill.CanvasTop > 0 ? ViewModel.Skill.CanvasTop : (mParent.ActualHeight / 2) - (ActualHeight / 2);
 

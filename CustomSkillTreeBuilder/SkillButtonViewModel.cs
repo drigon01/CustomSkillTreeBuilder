@@ -4,11 +4,13 @@ using System;
 
 namespace CustomSkillTreeBuilder
 {
-  class SkillButtonViewModel : PropertyAware
+  public class SkillButtonViewModel : PropertyAware
   {
     private UISkill mSkill;
 
-    public void Initialze(UISkill skill)
+    public SkillButtonViewModel() { }
+
+    public SkillButtonViewModel(UISkill skill)
     {
       Skill = skill;
       Skill.CanvasLeft = 0;
@@ -16,7 +18,11 @@ namespace CustomSkillTreeBuilder
       Skill.ChildSkills = new System.Collections.Generic.List<string>();
     }
 
-    public UISkill Skill { get { return mSkill; } set { mSkill = value; NotifyPropertyChanged(this.NameOf(p => p.Skill)); } }
+    public UISkill Skill
+    {
+      get { return mSkill; }
+      set { mSkill = value; NotifyPropertyChanged(this.NameOf(p => p.Skill)); }
+    }
 
     public ImageSource Image
     {

@@ -38,6 +38,7 @@ namespace CustomSkillTreeBuilder
   /// <summary>
   /// Describes a skill
   /// </summary>
+  [XmlInclude(typeof(UISkill))]
   public class Skill
   {
     public string Name { get; set; }
@@ -45,18 +46,19 @@ namespace CustomSkillTreeBuilder
     public string[] Effects { get; set; }
   }
 
-  [XmlRoot(ElementName = "Skill")]
   public class UISkill : Skill
   {
     public double CanvasTop;
     public double CanvasLeft;
-    [XmlElement("Child")]
+    [XmlArray("ChildSkills")]
+    [XmlArrayItem("Child")]
     public List<string> ChildSkills { get; set; }
   }
 
   /// <summary>
   /// Describes a Skill tree with connections and variosu skills;
   /// </summary>
+  [XmlInclude(typeof(UISkill))]
   [XmlRoot(ElementName = "SkillTree")]
   public class SkillTree : List<UISkill> { }
 }
