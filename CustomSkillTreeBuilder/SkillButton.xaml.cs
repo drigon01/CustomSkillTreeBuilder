@@ -54,9 +54,13 @@ namespace CustomSkillTreeBuilder
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
       mParent = (Canvas)Parent;
+      var wX = ViewModel.Skill.CanvasLeft > 0 ? ViewModel.Skill.CanvasLeft : (mParent.ActualWidth / 2) - (ActualWidth);
+      var wY = ViewModel.Skill.CanvasTop > 0 ? ViewModel.Skill.CanvasTop : (mParent.ActualHeight / 2) - (ActualHeight / 2);
 
-      SetValue(Canvas.LeftProperty, (mParent.ActualWidth / 2) - (ActualWidth));
-      SetValue(Canvas.TopProperty, (mParent.ActualHeight / 2) - (ActualHeight / 2));
+      SetValue(Canvas.LeftProperty, wX);
+      SetValue(Canvas.TopProperty, wY);
+      ViewModel.Skill.CanvasLeft = wX;
+      ViewModel.Skill.CanvasTop = wY;
     }
 
     private void OnMouseMove(object sender, MouseEventArgs e)

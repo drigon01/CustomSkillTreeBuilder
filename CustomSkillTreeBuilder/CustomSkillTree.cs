@@ -50,8 +50,8 @@ namespace CustomSkillTreeBuilder
   {
     public double CanvasTop;
     public double CanvasLeft;
-    [XmlElement("Skill")]
-    public List<Skill> ChildSkills { get; set; }
+    [XmlElement("Child")]
+    public List<string> ChildSkills { get; set; }
   }
 
   /// <summary>

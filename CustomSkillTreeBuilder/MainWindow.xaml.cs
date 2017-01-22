@@ -26,6 +26,10 @@ namespace CustomSkillTreeBuilder
       {
         ViewModel.LoadComponents();
       }
+      else
+      {
+        ViewModel.LoadTree();
+      }
     }
 
     private void Save_Clicked(object sender, RoutedEventArgs e)
@@ -59,7 +63,7 @@ namespace CustomSkillTreeBuilder
     private void OnSkillSelected(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
       if (!AddNewCompnent(((TextBlock)sender).Text, "Skill"))
-      {
+      { 
         ViewModel.Context = "Skill";
         ViewModel.IsContextMenuOpen = true;
       }
@@ -80,9 +84,28 @@ namespace CustomSkillTreeBuilder
 
     private void AddNewFamily(object sender, RoutedEventArgs e)
     {
-      var wArgs = (SkillFamilyAdditionEventArgs)e;
-      ViewModel.AddNewComponent(new SkillFamily { Name = wArgs.Name });
-      mSelectedSkillFamilyName = wArgs.Name;
+      if (e is SkillFamilyAdditionEventArgs)
+      {
+        var wArgs = (SkillFamilyAdditionEventArgs)e;
+        ViewModel.AddNewComponent(new SkillFamily { Name = wArgs.Name });
+        mSelectedSkillFamilyName = wArgs.Name;
+      }
+      else
+      {
+        var wArgs = (SkillAdditionEventArgs)e;
+        ViewModel.AddNewComponent(new SkillFamily
+        {
+          Name = mSelectedSkillFamilyName,
+          Skills = new List<Skill>
+          {
+            new Skill
+            {
+            Name= wArgs.Name,
+            Effects = wArgs.Effects
+            }
+          }
+        });
+      }
     }
 
     private bool AddNewCompnent(string text, string type)

@@ -11,7 +11,12 @@
   <Window.Resources>
     <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <local:SkillToMarginConverter x:Key="SkillToMarginConverter"/>
-    <LinearGradientBrush x:Key="BGBrush" StartPoint="1,0" EndPoint="0,1">
+    <LinearGradientBrush x:Key="BGBrush" StartPoint="0.5,0" EndPoint="0.5,1" Opacity="0.65">
+      <GradientStop Color="Navy" Offset="0"/>
+      <GradientStop Color="Black" Offset="0.9"/>
+      <GradientStop Color="#00000044" Offset="1" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="MenuItemBGBrush" StartPoint="1,0" EndPoint="0,1">
       <GradientStop Color="Transparent" Offset="0.7"/>
       <GradientStop Color="Black" Offset="0.8"/>
     </LinearGradientBrush>
@@ -28,16 +33,16 @@
       <ColumnDefinition Width="120"/>
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
-    <Menu IsMainMenu="True" Grid.Row="0" Grid.ColumnSpan="2" Foreground="White" FontWeight="DemiBold" Background="{StaticResource BGBrush}">
-      <MenuItem Header="Components">
-        <MenuItem CommandParameter="Components" Header="_Open" Click="Open_Clicked" Foreground="Black" Background="{StaticResource BGBrush}"/>
-        <MenuItem CommandParameter="Components" Header="_Save" Click="Save_Clicked" Foreground="Black" Background="{StaticResource BGBrush}"/>
+    <Menu IsMainMenu="True" Grid.Row="0" Grid.ColumnSpan="2" Foreground="White" FontWeight="DemiBold" Background="{StaticResource MenuItemBGBrush}">
+      <MenuItem Header="Components" Background="{StaticResource BGBrush}">
+        <MenuItem CommandParameter="Components" Header="_Open" Click="Open_Clicked" Foreground="Black" Background="{StaticResource MenuItemBGBrush}"/>
+        <MenuItem CommandParameter="Components" Header="_Save" Click="Save_Clicked" Foreground="Black" Background="{StaticResource MenuItemBGBrush}"/>
       </MenuItem>
       <Separator/>
       <MenuItem Header="SkillTree">
-        <MenuItem CommandParameter="SkillTree" Header="_Open" Click="Open_Clicked" Foreground="Black" Background="{StaticResource BGBrush}"/>
-        <MenuItem CommandParameter="SkillTree" Header="_Save" Click="Save_Clicked" Foreground="Black" Background="{StaticResource BGBrush}"/>
-        <MenuItem Header="Print" Foreground="Black" Background="{StaticResource BGBrush}"/>
+        <MenuItem CommandParameter="SkillTree" Header="_Open" Click="Open_Clicked" Foreground="Black" Background="{StaticResource MenuItemBGBrush}"/>
+        <MenuItem CommandParameter="SkillTree" Header="_Save" Click="Save_Clicked" Foreground="Black" Background="{StaticResource MenuItemBGBrush}"/>
+        <MenuItem Header="Print" Foreground="Black" Background="{StaticResource MenuItemBGBrush}"/>
       </MenuItem>
     </Menu>
     <TreeView x:Name="mSideMenu" Grid.Row="1" Grid.Column="0"

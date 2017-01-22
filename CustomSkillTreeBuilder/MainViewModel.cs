@@ -23,6 +23,7 @@ namespace CustomSkillTreeBuilder
     private string mNodeConfigPath;
     private bool mIsContextMenuOpen;
     private ObservableCollection<SkillFamily> mSkillTreeComponents;
+
     private SkillTree mSkilTree = new SkillTree();
     private SkillButton mSelected;
     private object mContext;
@@ -44,7 +45,7 @@ namespace CustomSkillTreeBuilder
 
       mIsContextMenuOpen = false;
 
-      mNodeConfigPath = mOpenFileDialog.InitialDirectory + "\\" + Resources.defaultFile;
+      BuildNodes(mOpenFileDialog.InitialDirectory + "\\" + Resources.defaultFile);
       BGImage = new BitmapImage(new Uri("../../Resources/bgimg.jpg", UriKind.Relative));
     }
 
@@ -107,11 +108,28 @@ namespace CustomSkillTreeBuilder
         var wButton = new SkillButton(wUISkill);
         wButton.Connect += OnConnect;
         wButton.Moving += OnDraggingSkill;
+        wButton.Delete += OnDeleteSkill;
 
         Canvas.Children.Add(wButton);
       }
       else
       { MessageBox.Show("Already added"); }
+    }
+
+    private void OnDeleteSkill(object sender, RoutedEventArgs e)
+    {
+      var wSkillName = ((SkillButton)sender).Name;
+      System.Collections.Generic.List<UIElement> wToDelete = new System.Collections.Generic.List<UIElement>();
+      foreach (var wChild in Canvas.Children)
+      {
+        if ((wChild is Control ? ((Control)wChild).Name : ((System.Windows.Shapes.Shape)wChild).Name).Contains(wSkillName))
+        {
+          wToDelete.Add((UIElement)wChild);
+        }
+      }
+      wToDelete.ForEach(d => Canvas.Children.Remove(d));
+      mSkilTree.RemoveAll(s => s.Name == wSkillName);
+      mSkilTree.ForEach(s => s.ChildSkills.RemoveAll(ch => ch == wSkillName));
     }
 
     private void OnDraggingSkill(object sender, RoutedEventArgs e)
@@ -146,22 +164,11 @@ namespace CustomSkillTreeBuilder
       }
       else
       {
-        var wPos1 = GetButtonCenterPosition(mSelected);
-        var wPos2 = GetButtonCenterPosition((SkillButton)sender);
-        var wConnector =
-          new System.Windows.Shapes.Line
-          {
-            X1 = wPos1.X,
-            Y1 = wPos1.Y,
-            X2 = wPos2.X,
-            Y2 = wPos2.Y,
-            Stroke = new SolidColorBrush(Color.FromRgb(200, 200, 200)),
-            StrokeThickness = 2,
-            Name = string.Format("{0}_{1}", mSelected.Name, ((SkillButton)sender).Name)
-          };
+        var wTarget = (SkillButton)sender;
+        AddConnector(mSelected, wTarget);
 
-        Canvas.Children.Add(wConnector);
-        Panel.SetZIndex(wConnector, 0);
+        var wParentSkill = mSkilTree.FirstOrDefault(s => s.Name == mSelected.Name);
+        wParentSkill.ChildSkills.Add(wTarget.Name);
 
         mSelected = null;
       }
@@ -191,8 +198,13 @@ namespace CustomSkillTreeBuilder
     public void LoadComponents()
     {
       if (mOpenFileDialog.ShowDialog() == true)
-        mNodeConfigPath = mOpenFileDialog.FileName;
-      BuildNodes();
+        BuildNodes(mOpenFileDialog.FileName);
+    }
+
+    public void LoadTree()
+    {
+      if (mOpenFileDialog.ShowDialog() == true)
+        BuildTree(mOpenFileDialog.FileName);
     }
 
     public void SaveComponents()
@@ -225,14 +237,14 @@ namespace CustomSkillTreeBuilder
       }
     }
 
-    private void BuildNodes()
+    private void BuildNodes(string path)
     {
       SkillTreeComponents wObejct;
       try
       {
         var wSerializer = new XmlSerializer(typeof(SkillTreeComponents));
 
-        using (var wStream = new StringReader(File.ReadAllText(mNodeConfigPath)))
+        using (var wStream = new StringReader(File.ReadAllText(path)))
         using (var wReader = XmlReader.Create(wStream))
         {
           wObejct = (SkillTreeComponents)wSerializer.Deserialize(wReader);
@@ -251,6 +263,69 @@ namespace CustomSkillTreeBuilder
       }
     }
 
+    private void BuildTree(string path)
+    {
+      try
+      {
+        Canvas.Children.Clear();
+        var wSerializer = new XmlSerializer(typeof(SkillTree));
+
+        using (var wStream = new StringReader(File.ReadAllText(path)))
+        using (var wReader = XmlReader.Create(wStream))
+        {
+          mSkilTree = (SkillTree)wSerializer.Deserialize(wReader);
+        }
+
+        mSkilTree.ForEach(s => { Canvas.Children.Add(new SkillButton(s)); });
+
+        foreach (var wSkill in mSkilTree)
+        {
+          wSkill.ChildSkills.ForEach(name =>
+          {
+            foreach (var wElement in Canvas.Children)
+            {
+              SkillButton wParent = null;
+              if (wElement is SkillButton && ((SkillButton)wElement).Name == wSkill.Name)
+              {
+                wParent = (SkillButton)wElement;
+              }
+              if (wParent is SkillButton && wElement is SkillButton && ((SkillButton)wElement).Name == name)
+              {
+                AddConnector(wParent, (SkillButton)wElement);
+              }
+            }
+          });
+        }
+      }
+      catch (Exception wException)
+      {
+        MessageBox.Show(wException.Message, "Xml Parsing Error");
+      }
+    }
+
+    private void AddConnector(SkillButton parent, SkillButton child)
+    {
+      if (!(child.Name == parent.Name))
+      {
+        var wPos1 = GetButtonCenterPosition(parent);
+        var wPos2 = GetButtonCenterPosition(child);
+        var wConnector =
+          new System.Windows.Shapes.Line
+          {
+            X1 = wPos1.X,
+            Y1 = wPos1.Y,
+            X2 = wPos2.X,
+            Y2 = wPos2.Y,
+            Stroke = new SolidColorBrush(Color.FromRgb(200, 200, 200)),
+            StrokeThickness = 2,
+            Name = string.Format("{0}_{1}", parent.Name, child.Name)
+          };
+
+        Canvas.Children.Add(wConnector);
+        Panel.SetZIndex(wConnector, 0);
+      }
+    }
+
     public void AddNewComponent(SkillFamily family)
     {
       if (family is SkillFamily && family.Skills == null)
@@ -266,6 +341,7 @@ namespace CustomSkillTreeBuilder
         new EqualityComparer<SkillFamily>((f1, f2) => f1.Name == f2.Name)))
       {
         Context = "NewSkill";
+        
         IsContextMenuOpen = true;
       }
       else
