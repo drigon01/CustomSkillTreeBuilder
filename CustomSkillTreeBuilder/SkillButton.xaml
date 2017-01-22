@@ -11,6 +11,13 @@
         MouseMove="OnMouseMove"       
         Loaded="OnLoaded" 
         RenderTransformOrigin="0.5,0.5" Canvas.Left="0" Canvas.Top="0">
+  <Button.Resources>
+    <LinearGradientBrush x:Key="BGBrush" StartPoint="0.5,0" EndPoint="0.5,1" Opacity="0.65">
+      <GradientStop Color="Navy" Offset="0"/>
+      <GradientStop Color="Black" Offset="0.9"/>
+      <GradientStop Color="#00000044" Offset="1" />
+    </LinearGradientBrush>
+  </Button.Resources>
   <Button.Template>
     <ControlTemplate >
       <Grid>
@@ -23,16 +30,20 @@
             <ImageBrush ImageSource="{Binding Image}"/>
           </Ellipse.Fill>
         </Ellipse>
-        <StackPanel Grid.Column="1" Background="White">
+        <StackPanel Grid.Column="1" Background="{StaticResource BGBrush}">
           <ItemsControl ItemsSource="{Binding Skill.Effects}">
             <ItemsControl.ItemTemplate>
               <DataTemplate>
-                <TextBlock Text="{Binding}" Margin="10,0,0,0" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding}" Margin="10,0,0,0" TextWrapping="Wrap" FontWeight="DemiBold" Foreground="White"/>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
         </StackPanel>
-        <TextBlock Grid.ColumnSpan="2" Text="{Binding Skill.Name}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,-10" Background="White"/>
+        <TextBlock Grid.ColumnSpan="2" Text="{Binding Skill.Name}" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Bottom" 
+                   Margin="0,0,0,-10" Foreground="White" FontWeight="DemiBold"
+                   Background="{StaticResource BGBrush}"/>
       </Grid>
     </ControlTemplate>
   </Button.Template>
